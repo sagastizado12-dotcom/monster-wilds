@@ -65,7 +65,7 @@ function drawWarrior(ctx,sp,cx,cy,size,withBg){const p=ART[sp].pal,k=size/100;ct
  ctx.shadowColor=p.wep;ctx.shadowBlur=12*k;ctx.strokeStyle=p.wep;ctx.lineWidth=4*k;ctx.beginPath();ctx.moveTo(24*k,10*k);ctx.lineTo(44*k,-50*k);ctx.stroke();ctx.shadowBlur=0;
  ctx.fillStyle=p.skin;ctx.beginPath();ctx.arc(22*k,12*k,4*k,0,7);ctx.fill();
  ctx.restore();}
-function drawMandaraArt(ctx,cx,cy,size,sp){sp=sp||'Mandara';if(!artOk(sp)){drawWarrior(ctx,sp,cx,cy,size,false);return true;}const a=ART[sp],im=a.img;let [sx,sy,sw,sh]=a.crop||(a.cut?[0,0,im.naturalWidth,im.naturalHeight]:null)||[im.naturalWidth*0.28,0,im.naturalWidth*0.44,im.naturalHeight];const h=size*1.25,w=h*sw/sh;ctx.drawImage(im,sx,sy,sw,sh,cx-w/2,cy-h*0.62,w,h);return true;}
+function drawMandaraArt(ctx,cx,cy,size,sp){sp=sp||'Mandara';if(!artOk(sp)){drawWarrior(ctx,sp,cx,cy,size,false);return true;}const a=ART[sp],im=a.img;let [sx,sy,sw,sh]=a.crop||(a.cut?[0,0,im.naturalWidth,im.naturalHeight]:null)||[im.naturalWidth*0.28,0,im.naturalWidth*0.44,im.naturalHeight];if(window.SIS&&a.cut&&SIS.draw(ctx,sp,im,cx,cy,size,{flash:BT&&BT.ea&&BT.ea.flash&&BT.e&&BT.e.m.sp===sp?BT.ea.flash:0}))return true;const h=size*1.25,w=h*sw/sh;ctx.drawImage(im,sx,sy,sw,sh,cx-w/2,cy-h*0.62,w,h);return true;}
 // 16x16 pixel overworld sprite of Mandara
 function drawMandaraPix(px,py,sp){sp=sp||'Mandara';const q=ART[sp].pal;const MAP={'#101010':q.hair,'#e8c070':q.trim,'#c02020':q.skin,'#1a1a1a':q.arm,'#d4a030':q.trim,'#801010':q.bg[1]};const P=(c,x,y,w,h)=>{X.fillStyle=MAP[c]||c;X.fillRect(px+x,py+y,w,h);};
  P('rgba(0,0,0,.3)',2,14,12,2);P('#101010',3,2,10,9);// hair
@@ -76,7 +76,7 @@ function drawMandaraPix(px,py,sp){sp=sp||'Mandara';const q=ART[sp].pal;const MAP
  P('#1a1a1a',5,13,2,3);P('#1a1a1a',9,13,2,3);
  const gl=(G.frame>>2)%2?q.wep:'#ffffff';P(gl,13,3,1,10);P('#ffb0a0',13,4,1,3);P('#d4a030',12,11,3,1);}
 // ===== Monster sprite =====
-function drawMon(ctx,sp,cx,cy,size,back,opt){const still=(opt&&opt.still)||!window.MFX||MFX.red();if(still)return drawMon0(ctx,sp,cx,cy,size,back);const I=MFX.idle(sp,size,opt&&opt.seed);const fy=cy+size*0.5;ctx.save();ctx.translate(cx,fy);ctx.rotate(I.rot);ctx.scale(I.sx,I.sy);ctx.translate(-cx,-fy);drawMon0(ctx,sp,cx,cy+I.dy,size,back);ctx.restore();if(!(opt&&opt.noAura))MFX.aura(ctx,sp,cx,cy+I.dy,size*0.9);}
+function drawMon(ctx,sp,cx,cy,size,back,opt){if(ART[sp]&&window.SIS)return drawMon0(ctx,sp,cx,cy,size,back);const still=(opt&&opt.still)||!window.MFX||MFX.red();if(still)return drawMon0(ctx,sp,cx,cy,size,back);const I=MFX.idle(sp,size,opt&&opt.seed);const fy=cy+size*0.5;ctx.save();ctx.translate(cx,fy);ctx.rotate(I.rot);ctx.scale(I.sx,I.sy);ctx.translate(-cx,-fy);drawMon0(ctx,sp,cx,cy+I.dy,size,back);ctx.restore();if(!(opt&&opt.noAura))MFX.aura(ctx,sp,cx,cy+I.dy,size*0.9);}
 function drawMon0(ctx,sp,cx,cy,size,back){if(ART[sp]&&drawMandaraArt(ctx,cx,cy,size,sp))return;if(drawMonImg(ctx,sp,cx,cy,size,back))return;const s=SPECIES[sp];const h=hash(sp);const c1=TCOL[s.types[0]],c2=TCOL[s.types[1]||s.types[0]];const stage=evoLine(sp).indexOf(sp);const k=size/40;
  ctx.save();ctx.translate(cx,cy);if(back)ctx.scale(-1,1);
  if(s.legend){ctx.fillStyle='rgba(255,240,150,0.25)';ctx.beginPath();ctx.arc(0,-4*k,30*k,0,7);ctx.fill();}
@@ -179,10 +179,10 @@ function render(){const m=curMap();G.frame++;
  ents.sort((a,b)=>(a.fy!==undefined?a.fy:a.y)-(b.fy!==undefined?b.fy:b.y));
  if(m.outdoor&&window.MFX)MFX.roamers(m,camx,camy);
  for(const e of ents){const sx=(e.fx!==undefined?e.fx:e.x)*TS-camx,sy=(e.fy!==undefined?e.fy:e.y)*TS-camy;if(sx<-24||sy<-24||sx>VW+8||sy>VH+16)continue;
-  if(e.kind==='legend'&&ART[e.ref.sp]){if(window.MFX)MFX.aura(X,e.ref.sp,sx+8,sy+6,16);drawMandaraPix(sx,sy+Math.sin(G.frame/20)*1.5-1,e.ref.sp);}else if(e.kind==='legend'){if(window.MFX)MFX.aura(X,e.ref.sp,sx+8,sy+6,18);drawMon(X,e.ref.sp,sx+8,sy+2+Math.sin(G.frame/15)*2.5,30);}
+  if(e.kind==='legend'&&ART[e.ref.sp]){if(window.MFX&&!window.SIS)MFX.aura(X,e.ref.sp,sx+8,sy+6,16);if(!(window.SIS&&SIS.pix(X,sx,sy,e.ref.sp,Math.abs(S.x-e.x)>=Math.abs(S.y-e.y)?(S.x<e.x?'left':'right'):(S.y<e.y?'up':'down'))))drawMandaraPix(sx,sy+Math.sin(G.frame/20)*1.5-1,e.ref.sp);}else if(e.kind==='legend'){if(window.MFX)MFX.aura(X,e.ref.sp,sx+8,sy+6,18);drawMon(X,e.ref.sp,sx+8,sy+2+Math.sin(G.frame/15)*2.5,30);}
   else if(e.kind==='item'){const k=Math.sin(G.frame/8);X.fillStyle='#fff6c0';X.beginPath();X.moveTo(sx+8,sy+3-k);X.lineTo(sx+9.2,sy+7);X.lineTo(sx+13+k,sy+8);X.lineTo(sx+9.2,sy+9);X.lineTo(sx+8,sy+13+k);X.lineTo(sx+6.8,sy+9);X.lineTo(sx+3-k,sy+8);X.lineTo(sx+6.8,sy+7);X.fill();}
   else drawEnt(e,sx,sy);}
- WS.npc(X,pxw-camx,pyw-camy,WS.look('player','player'),G.dir||'down',G.mv?(G.mv.t<0.5?1:3):0);
+ WS.npc(X,pxw-camx,pyw-camy,WS.look('player','player'),G.dir||'down',window.AMB&&AMB.reduced?'i0':G.mv?'w'+(((S.x+S.y)&1)?(G.mv.t<0.5?3:0):(G.mv.t<0.5?1:2)):('i'+((((G.frame||0)>>4)%7)===0?1:0)));
  drawHearts(camx,camy);
  if(window.AMB)AMB.mid(m,camx,camy,ents);
  WS.tint(m);
@@ -216,7 +216,7 @@ function layerKey(L,k){if(L.onKey&&L.onKey(k)===true)return;const os=[...L.el.qu
  else if(k==='a'){const o=os[L.idx];if(o){if(o.tagName==='INPUT'){o.focus();o.select&&o.select();}else o.click();}}
  else if(k==='b'){if(L.onB)L.onB();}}
 function mkEl(cls,html){const d=document.createElement('div');d.className=cls;d.innerHTML=html;$('ui').appendChild(d);return d;}
-function say(text){if(window.SFX)SFX.play('blip');return new Promise(res=>{const el=mkEl('dlg','<div class="dtext">'+esc(fmt(text))+'</div><div class="more">&#9660;</div>');const L={el,remove:true,onKey:k=>{if(k==='a'||k==='b'){popL(L);res();}return true;}};el.onclick=()=>L.onKey('a');pushL(L);});}
+function say(text){if(window.SFX)SFX.play('blip');if(window.MATURE)text=MATURE.line(text,fmt);return new Promise(res=>{const el=mkEl('dlg','<div class="dtext">'+esc(fmt(text))+'</div><div class="more">&#9660;</div>');const L={el,remove:true,onKey:k=>{if(k==='a'||k==='b'){popL(L);res();}return true;}};el.onclick=()=>L.onKey('a');pushL(L);});}
 async function sayAll(arr){for(const t of arr)await say(t);}
 function choose(prompt,opts,cancel=true,cls){return new Promise(res=>{const el=mkEl('menu '+(cls||''),(prompt?'<div class="mp">'+esc(fmt(prompt))+'</div>':'')+opts.map((o,i)=>'<button class="opt" data-i="'+i+'">'+esc(fmt(o))+'</button>').join(''));
  const L={el,remove:true,onB:()=>{if(cancel){popL(L);res(-1);}}};el.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{popL(L);res(+b.dataset.i);});pushL(L);});}
@@ -259,10 +259,10 @@ function pickMusic(){if(G.mode==='title'||!S)return 'title';if(G.victoryUntil>pe
  if(BT&&$('battle').style.display==='block'){const o=BT.o,sp=BT.e.m.sp;if(o.boss||sp==='Mandara')return 'mandara';if(sp==='Mancaco')return 'mancaco';if(sp==='Mantermo')return 'mantermo';if(o.legend)return 'gym';if(!o.wild){const t=o.t||{};if(t.elite!==undefined)return 'champion';if(t.gym!==undefined)return 'gym';if(/Follower/.test(t.cls||''))return 'follower';return 'trainer';}return 'wild';}
  const m=curMap();if(!m.outdoor)return m.type==='castle'?'mandara':m.type==='league'?'summit':m.type==='lair'?'mancaco':'interior';
  const tn=townAt(S.x,S.y);const r=regionAt(S.x,S.y);if(WS.dark()>0.6)return 'night';if(tn)return ['leaf','ember','coast','gale','snow','dusk'][tn.id];if(r==='cave')return 'cave';if(r==='summit'||r==='crimson')return 'summit';const z=ZONEMAP[S.y*WW+S.x];if(z&&/^r\d/.test(z))return 'route';return r;}
-function audioTick(){if(!window.SFX||!SFX.ok)return;SFX.music(pickMusic());if(!S||G.mode!=='world'||S.map!=='world'||(BT&&$('battle').style.display==='block')){SFX.ambient({});return;}
+function audioTick(){if(!window.SFX||!SFX.ok)return;SFX.music(pickMusic());if(!S||G.mode!=='world'||S.map!=='world'||(BT&&$('battle').style.display==='block')){SFX.ambient(S&&G.mode==='world'&&S.map!=='world'&&window.AMB&&AMB.raining&&(()=>{const m=curMap(),tn=m&&TOWNS[m.town];return tn?AMB.raining(AMB.region(tn.x+10,tn.y+7)):false;})()?{rain:1,indoor:1}:{});return;}
  const r=regionAt(S.x,S.y);let sea=false;for(const [a,b] of [[0,0],[6,0],[-6,0],[0,6],[0,-6]]){const xx=S.x+a,yy=S.y+b;if(xx>=0&&yy>=0&&xx<WW&&yy<WH&&OCEAN[yy*WW+xx])sea=true;}const ar=window.AMB&&AMB.region?AMB.region(S.x,S.y):r;
  SFX.ambient({rain:window.AMB&&AMB.raining&&AMB.raining(ar),wind:r==='gale'||r==='snow',waves:sea,birds:WS.dark()<0.3&&(r==='leaf'||r==='coast'||r==='gale'),fire:r==='ember'||r==='crimson'});}
-async function soundMenu(){while(true){const c=SFX.cfg;const i=await choose('Sound settings (saved on this device)',['Music volume: '+Math.round(c.mv*10)+'/10','Effects volume: '+Math.round(c.sv*10)+'/10',c.mute?'Sound: MUTED (tap to unmute)':'Sound: ON (tap to mute)','Back']);if(i<0||i===3)return;
+async function soundMenu(){while(true){const c=SFX.cfg;const i=await choose('Sound settings (saved on this device)',['Music volume: '+Math.round(c.mv*10)+'/10','Effects volume: '+Math.round(c.sv*10)+'/10',c.mute?'Sound: MUTED (tap to unmute)':'Sound: ON (tap to mute)','Mature language: '+(window.MATURE&&MATURE.on?'On':'Off'),'Back']);if(i<0||i===4)return;if(i===3){MATURE.set(!MATURE.on);continue;}
  if(i===0){let v=Math.round(c.mv*10);v=v>=10?0:v+2;SFX.setMusic(v/10);}if(i===1){let v=Math.round(c.sv*10);v=v>=10?0:v+2;SFX.setSfx(v/10);SFX.play('select');}if(i===2)SFX.toggleMute();}}
 function tryMove(d){G.dir=d;S.dir=d;const [dx,dy]=dirVec(d);const nx=S.x+dx,ny=S.y+dy;
  const ents=entities();const e=entAt(nx,ny,ents);
@@ -511,7 +511,7 @@ async function dexScreen(){const seen=Object.keys(S.seen).length,caught=Object.k
   const h='<h2>#'+s.id+' '+s.name+'</h2><div class="mrow"><span class="spr big" data-sp="'+s.name+'"></span><div>Type: '+s.types.map(t=>'<span class="ty" style="background:'+TCOL[t]+'">'+t+'</span>').join('')+'<br>Height: '+s.h+' m &nbsp; Weight: '+s.w+' kg<br>Ability: '+s.ability+'<br>Habitat: '+s.habitat+'<br>Evolution: '+evoLine(s.name).map((n,j,a)=>n+(SPECIES[n].evo?' (Lv'+SPECIES[n].evo.lv+') &rarr; ':'')).join('')+'<br>Where found: '+esc(whereFound(s.name))+'</div></div><p>'+(full?esc(s.lore):'<i>Catch it to unlock full lore.</i>')+'</p>'+(full&&FOOTNOTES[s.name]?'<p class="hint">'+esc(FOOTNOTES[s.name])+'</p>':'')+(ART[s.name]?(artOk(s.name)?'<img class="dexart"'+(ART[s.name].cut?' style="background:linear-gradient('+ART[s.name].pal.bg[0]+','+ART[s.name].pal.bg[1]+')"':'')+' src="'+ART[s.name].src+'" alt="'+s.name+'">':'<span class="spr big" data-sp="'+s.name+'"></span>'):'')+(full?'<p>Base stats: '+['HP','Atk','Def','SpA','SpD','Spe'].map((k,j)=>k+' '+s.base[j]).join(' / ')+'</p>':'');
   const p=waitScreen(h);paintSprites($('ui'));await p;}}
 function schedText(p){return p.sched.map(e=>String(e[0]).padStart(2,'0')+':00 - '+(e[1]==='world'?(townAt(e[2],e[3])||{name:'outdoors'}).name+' (outdoors)':MAPS[e[1]].name)).join('<br>');}
-async function peopleScreen(){const list=[];for(const p of PEOPLE)if(S.met[p.id])list.push({id:p.id,n:p.name,age:p.age,job:p.job,pers:p.pers,back:p.back,sch:schedText(p),p});
+async function peopleScreen(){const list=[];for(const p of PEOPLE)if(S.met[p.id])list.push({id:p.id,n:p.name,age:p.age,job:p.job,pers:p.pers,back:window.MATURE?MATURE.back(p):p.back,sch:schedText(p),p});
  for(const t of TRAINERS)if(S.rel&&S.rel[t.id]&&!PEOPLE_BY_ID[t.id]&&!BIOS[t.name])list.push({id:t.id,n:fmt(t.name),age:'?',job:t.cls,pers:'Competitive',back:'A trainer you have battled.',sch:'At their post.',p:trainerPerson(t)});
  for(const k in BIOS)if(S.met[k]){const b=BIOS[k];{const tt=TRAINERS.find(t=>t.name===k||(k==='rival'&&t.rival&&t.id==='rival1'));list.push({id:tt&&tt.id,p:tt&&trainerPerson(tt),n:k==='rival'?S.rival:k==='monk'?'The Monk':k,age:b.age,job:b.job,pers:b.pers,back:b.back,sch:k==='rival'?'Always on the road ahead of you.':'At their post.'});}}
  if(!list.length){await say('You haven\'t met anyone yet.');return;}
@@ -574,7 +574,7 @@ async function readAltar(){S.scripture=S.scripture||[];const unread=VERSES.findI
 function dayNum(){return Math.floor(S.time/1440);}
 function festival(){return FESTS[dayNum()%7]||null;}
 // ===== Mandara climax =====
-function artScene(lines,sp){sp=sp||'Mandara';return new Promise(async res=>{const el=mkEl('screen artscene',(artOk(sp)?'<img'+(ART[sp].cut?' class="cut" style="background:radial-gradient(ellipse at 50% 80%,'+ART[sp].pal.bg[1]+','+ART[sp].pal.bg[0]+')"':'')+' src="'+ART[sp].src+'" alt="'+sp+'">':'<canvas class="artcv" width="280" height="240"></canvas>')+'<div class="cap"></div>');const cv=el.querySelector('.artcv');if(cv){drawWarrior(cv.getContext('2d'),sp,140,120,190,true);}const L={el,remove:true,onB:()=>{}};pushL(L);
+function artScene(lines,sp){sp=sp||'Mandara';return new Promise(async res=>{const el=mkEl('screen artscene',(artOk(sp)&&ART[sp].cut&&window.SIS?'<canvas class="artcv sisanim" width="560" height="480" style="background:radial-gradient(ellipse at 50% 80%,'+ART[sp].pal.bg[1]+','+ART[sp].pal.bg[0]+')"></canvas>':artOk(sp)?'<img'+(ART[sp].cut?' class="cut" style="background:radial-gradient(ellipse at 50% 80%,'+ART[sp].pal.bg[1]+','+ART[sp].pal.bg[0]+')"':'')+' src="'+ART[sp].src+'" alt="'+sp+'">':'<canvas class="artcv" width="280" height="240"></canvas>')+'<div class="cap"></div>');const cv=el.querySelector('.artcv');if(cv&&cv.classList.contains('sisanim')){const g=cv.getContext('2d');SIS.animCanvas(cv,sp,()=>{g.setTransform(1,0,0,1,0,0);g.clearRect(0,0,560,480);g.setTransform(2,0,0,2,0,0);SIS.draw(g,sp,ART[sp].img,140,128,168,{});});}else if(cv){drawWarrior(cv.getContext('2d'),sp,140,120,190,true);}const L={el,remove:true,onB:()=>{}};pushL(L);
  for(const t of lines){el.querySelector('.cap').textContent=fmt(t);await new Promise(r=>{const prev=L.onKey;L.onKey=k=>{if(k==='a'||k==='b'){L.onKey=null;r();}return true;};el.onclick=()=>{L.onKey=null;el.onclick=null;r();};});}
  popL(L);res();});}
 async function mandaraEvent(l){if(!S.beaten.vesper2){await say('A crushing heat holds you back. The Monk stands guard before the throne.');return;}
@@ -649,8 +649,8 @@ function lookFor(e){if(e.kind==='person'){const p=e.ref;let role=p.priest?'pries
 function faceFor(e){const id=e.ref&&e.ref.id||e.kind;if(G.faceT&&G.faceT[id]&&G.faceT[id].until>S.time)return G.faceT[id].d;
  if(S.map===curMap().id){const dx=S.x-e.x,dy=S.y-e.y;if(Math.abs(dx)+Math.abs(dy)<=2&&(dx||dy))return Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up');}
  if(e.dir)return e.dir;if(e.ref&&e.ref.face)return e.ref.face;const k=(Math.floor(S.time/6)+hash(String(id)))%7;return ['down','down','left','down','right','down','up'][k];}
-function drawEnt(e,sx,sy){const f=G.frame;const walking=e.fx!==undefined&&e.moving;const fr=walking?((f>>3)&1?1:3):(((f+hash(String(e.x*7+e.y)))>>5)%3===0?2:0);
- WS.npc(X,sx,sy,lookFor(e),faceFor(e),window.AMB&&AMB.reduced?0:fr);}
+function drawEnt(e,sx,sy){const f=G.frame;const walking=e.fx!==undefined&&e.moving;const fr=walking?'w'+(((f/8)|0)%4):('i'+((((f+hash(String(e.x*7+e.y)))>>4)%7)===0?1:0));
+ WS.npc(X,sx,sy,lookFor(e),faceFor(e),window.AMB&&AMB.reduced?'i0':fr);}
 function drawHearts(camx,camy){if(!G.hearts||!G.hearts.length)return;const now=performance.now();G.hearts=G.hearts.filter(h=>now-h.t0<1400);
  for(const h of G.hearts){if(h.map!==S.map)continue;const k=(now-h.t0)/1400;const n=Math.abs(h.n);for(let i=0;i<n;i++){const x=h.x*TS-camx+8+(i-(n-1)/2)*6+Math.sin(k*8+i)*1.2,y=h.y*TS-camy-12-k*16-i*2;
   X.globalAlpha=Math.max(0,1-k*k);X.fillStyle=h.n<0?'#7a6a8a':'#ff4a6a';X.beginPath();X.moveTo(x,y+2.6);X.bezierCurveTo(x-4,y-.6,x-2,y-3.4,x,y-1.2);X.bezierCurveTo(x+2,y-3.4,x+4,y-.6,x,y+2.6);X.fill();X.strokeStyle='#ffd0a0';X.lineWidth=.4;X.stroke();

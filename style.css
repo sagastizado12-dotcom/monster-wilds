@@ -83,3 +83,4 @@ html,body{background:#050308}
 @keyframes monbreath{0%,100%{transform:scale(1,1) translateY(0)}50%{transform:scale(1.03,.97) translateY(1px)}}
 .spr canvas{animation:monbreath 2.6s ease-in-out infinite;transform-origin:50% 90%}
 body.fxlow .spr canvas{animation:none}
+.artscene canvas.sisanim{flex:1;min-height:0;width:100%;height:auto;object-fit:contain;display:block}

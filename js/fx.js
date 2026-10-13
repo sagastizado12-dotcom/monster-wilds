@@ -29,7 +29,7 @@ M.roamers=function(m,camx,camy){if(M.red()||S.map!=='world')return;const t=now()
  for(let y=y0;y<=y0+VH/TS+1&&cnt<4;y++)for(let x=x0;x<=x0+VW/TS+1&&cnt<4;x++){if(x<0||y<0||x>=m.w||y>=m.h)continue;const v=m.t[y*m.w+x];if(v!==T.TALL&&v!==T.SNOWTALL)continue;
   const h=hash(x+','+y);if(h%61!==0)continue;const z=ZONEMAP[y*m.w+x];if(!z||!ZONES[z])continue;const sp=ZONES[z].sp[h%ZONES[z].sp.length];cnt++;
   const per=6+(h%5);const ph=((t+h%17)/per)%1;const vis=ph<0.7;if(!vis)continue;const k=ph/0.7;const dx=Math.sin(k*Math.PI*2+h)*10,hop=Math.abs(Math.sin(k*Math.PI*6))*(M.isFly(sp)?0:3)+(M.isFly(sp)?4+Math.sin(t*3)*2:0);
-  const sx=x*TS-camx+8+dx,sy=y*TS-camy+10-hop;X.save();X.globalAlpha=Math.min(1,Math.sin(k*Math.PI)*3)*0.95;X.fillStyle='rgba(0,0,0,.3)';X.beginPath();X.ellipse(x*TS-camx+8+dx,y*TS-camy+14,4,1.4,0,0,7);X.fill();
+  const sx=x*TS-camx+8+dx,sy=y*TS-camy+10-hop;X.save();X.globalAlpha=Math.min(1,Math.sin(k*Math.PI)*3)*0.95;{const fl=M.isFly(sp),hk=fl?Math.max(.35,1-hop/12):1-hop/10;X.fillStyle='rgba(10,4,20,'+(fl?.22*hk:.34)+')';X.beginPath();X.ellipse(x*TS-camx+8+dx,y*TS-camy+14,4.4*hk,1.5*hk,0,0,7);X.fill();}
   drawMon(X,sp,sx,sy-2,11,Math.cos(k*Math.PI*2+h)<0,{still:true});X.restore();}};
 // ================= Battle FX =================
 const B={fx:[],nums:[],busy:null,shake:0};M.B=B;

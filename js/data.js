@@ -113,6 +113,14 @@ function evoLine(n){let r=n;while(SPECIES[r].pre)r=SPECIES[r].pre;const out=[r];
 
 const ITEMS={
  'Potion':{price:200,desc:'Restores 20 HP.',heal:20},
+ 'Wildflower Posy':{price:120,desc:'A gift: bright Mossgrove wildflowers.',gift:1},
+ 'Ember Charm':{price:220,desc:'A gift: a warm glass charm from Cinderbrook.',gift:1},
+ 'Sea Glass':{price:150,desc:'A gift: smooth sea glass from the island coves.',gift:1},
+ 'Spiced Tea':{price:140,desc:'A gift: Galecrest wind-dried spiced tea.',gift:1},
+ 'Frost Lily':{price:260,desc:'A gift: a lily that never thaws, from Frostpeak.',gift:1},
+ 'Star Candle':{price:240,desc:'A gift: a Duskhollow candle that burns blue.',gift:1},
+ 'Honey Bread':{price:100,desc:'A gift: Ilsa\'s famous honey bread.',gift:1},
+ 'Old Coin':{price:300,desc:'A gift: an ancient coin from the ruins.',gift:1},
  'Super Potion':{price:600,desc:'Restores 60 HP.',heal:60},
  'Max Potion':{price:1500,desc:'Fully restores HP.',heal:9999},
  'Revive':{price:1500,desc:'Revives a fainted monster to half HP.',revive:true},
@@ -126,12 +134,12 @@ const ITEMS={
 
 // ===== World layout =====
 const TOWNS=[
- {id:0,name:'Mossgrove',x:8,y:92,type:'Leaf',desc:'A quiet farming village under old oaks. Your hometown.'},
- {id:1,name:'Cinderbrook',x:56,y:92,type:'Fire',desc:'A smithing town built over warm volcanic springs.'},
- {id:2,name:'Tidehaven',x:104,y:92,type:'Tide',desc:'A fishing port on the shore of Mirrorlake.'},
- {id:3,name:'Galecrest',x:122,y:46,type:'Gale',desc:'A cliffside town of windmills and kites.'},
- {id:4,name:'Frostmere',x:84,y:10,type:'Frost',desc:'A snowbound town around a frozen shrine.'},
- {id:5,name:'Duskhollow',x:24,y:40,type:'Dark',desc:'A twilight town among ancient ruins.'}
+ {id:0,name:'Mossgrove',x:34,y:138,type:'Leaf',desc:'A quiet farming village under old oaks. Your hometown.'},
+ {id:1,name:'Cinderbrook',x:92,y:150,type:'Fire',desc:'A smithing town built over warm volcanic springs.'},
+ {id:2,name:'Tidehaven',x:170,y:162,type:'Tide',desc:'A fishing port on the south-east coast, with a long dock and the island lighthouse.'},
+ {id:3,name:'Galecrest',x:196,y:84,type:'Gale',desc:'A cliffside town of windmills and kites.'},
+ {id:4,name:'Frostmere',x:150,y:24,type:'Frost',desc:'A snowbound town around a frozen shrine.'},
+ {id:5,name:'Duskhollow',x:30,y:72,type:'Dark',desc:'A twilight town among ancient ruins.'}
 ];
 const TW=20,TH=14; // town size
 const GYMS=[
@@ -156,5 +164,11 @@ const ZONES={
  r3:{name:'Route 3 - Windward Climb',lv:[15,21],sp:['Breezel','Pebblit','Psyfly','Boltnut','Pondhop']},
  r4:{name:'Route 4 - Frostpeak Trail',lv:[22,28],sp:['Snowpup','Frostfin','Pebblit','Galeon','Boltnut']},
  cave:{name:'Ember Caverns',lv:[26,32],sp:['Pebblit','Ironmite','Emberat','Gloomote','Boulderon']},
+ forest:{name:'Mossgrove Deepwood',lv:[4,9],sp:['Fluffin','Mossnail','Psyfly','Sprigling','Breezel']},
+ shore:{name:'Shell Coast & Mirrorlake Shore',lv:[10,17],sp:['Pondhop','Frostfin','Lilyleap','Zappip','Torrentail']},
+ slopes:{name:'Cinder Slopes',lv:[12,19],sp:['Emberat','Pebblit','Scorchrat','Boltnut']},
+ bluffs:{name:'Galecrest Bluffs',lv:[19,26],sp:['Breezel','Galeon','Psyfly','Voltusk','Boltnut']},
+ heights:{name:'Frostpeak Heights',lv:[26,33],sp:['Snowpup','Frostfin','Blizzhound','Galeon','Pebblit']},
+ duskwild:{name:'Duskwild Moors',lv:[30,37],sp:['Gloomote','Duskowl','Mindmoth','Umbrawl','Psyfly']},
  r6:{name:'Route 6 - Victory Road',lv:[34,40],sp:['Umbrawl','Duskowl','Ferrobeast','Gearhorn','Voltusk','Scorchrat']}
 };

@@ -79,3 +79,7 @@ html,body{background:#050308}
 #pad button{background:radial-gradient(circle at 35% 30%,#3a2a40,#120a16);border:2px solid #b8893a;color:#f6d88a;box-shadow:0 0 0 1px #2a1806,inset 0 0 8px rgba(0,0,0,.8),0 3px 8px rgba(0,0,0,.6);text-shadow:0 0 6px rgba(255,190,80,.6)}
 #pad button.on{background:radial-gradient(circle,#8a2a1a,#3a0a0a);box-shadow:0 0 12px rgba(255,140,60,.7)}
 #ui.dark{background:radial-gradient(ellipse at 50% 40%,#1a0c20,#000 75%)}
+
+@keyframes monbreath{0%,100%{transform:scale(1,1) translateY(0)}50%{transform:scale(1.03,.97) translateY(1px)}}
+.spr canvas{animation:monbreath 2.6s ease-in-out infinite;transform-origin:50% 90%}
+body.fxlow .spr canvas{animation:none}
